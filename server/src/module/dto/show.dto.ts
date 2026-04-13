@@ -8,7 +8,8 @@ class RegisterDto extends BaseDto {
       screenName: z.string(),
       screenType: z.enum(["IMAX", "Dolby Atmos", "3D", "Standard", "VIP Lounge"]),
       start: z.string().transform((val) => new Date(val)),
-      end: z.string().transform((val) => new Date(val))
+      end: z.string().transform((val) => new Date(val)),
+      genre: z.enum(["Action", "Drama", "Comedy", "Sci-Fi", "Romance", "Fantasy"]),
     })
     .strict();
 }

@@ -7,7 +7,6 @@ import {
   timestamp,
   pgEnum,
   text,
-  decimal,
   primaryKey,
   integer,
   check,
@@ -48,6 +47,7 @@ export const screenTypeEnum = pgEnum("screen_type", [
   "Standard",
   "VIP Lounge",
 ]);
+export const showGenreEnum = pgEnum("show_genre", ["Action", "Drama", "Comedy", "Sci-Fi", "Romance", "Fantasy"]);
 
 export const usersTable = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -113,6 +113,7 @@ export const showsTable = pgTable(
       precision: 10,
       scale: 2,
     }).notNull(),
+    showGenre: showGenreEnum("show_genre").notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
@@ -187,7 +188,15 @@ export const ticketTable = pgTable("tickets", {
   //   .references(() => bookingsTable.bookingId)
   //   .notNull(),
   userId: uuid("user_id")
-    .references(() => usersTable.id)
+    .references(() => usersTable.id, {onDelete: "cascade"})
+    .notNull(),
+  
+  showId: uuid("show_id")
+    .references(() => showsTable.showId)
+    .notNull(),
+  
+  seatId: uuid("seat_id")
+    .references(() => seatsTable.seatId)
     .notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),

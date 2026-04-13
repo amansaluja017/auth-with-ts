@@ -4,20 +4,23 @@ import { bookSeatsService, getSeatsService } from "./seat.service";
 import ApiResponse from "../../common/utils/api-response";
 
 export const getSeats = async (
-  req: Request<{ showId: string; screenId: string }>,
+  req: Request<{ showId: string }>,
   res: Response,
 ) => {
-  if (!req.params.screenId || !req.params.showId)
-    throw ApiError.badRequest("Invalid show or screen");
+  if (!req.params.showId) throw ApiError.badRequest("Invalid show or screen");
 
-  const seats = await getSeatsService(req.params);
+  const { seats, show } = await getSeatsService(req.params);
 
-  ApiResponse.ok(res, "seats fetch successfully", seats);
+  ApiResponse.ok(res, "seats fetch successfully", { seats, show });
 };
 
-export const bookSeats = async (req: Request, res: Response) => {
+export const bookSeats = async (
+  req: Request<{ showId: string }>,
+  res: Response,
+) => {
   const { id: userId } = req.customer;
-  const { showId, seatIds }: { showId: string; seatIds: string[] } = req.body;
+  const { showId } = req.params;
+  const { seatIds }: { seatIds: string[] } = req.body;
 
   if (!seatIds || !seatIds.length)
     throw ApiError.badRequest("seat id is Invalid");

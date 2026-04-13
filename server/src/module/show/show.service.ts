@@ -15,13 +15,15 @@ export const createShowService = async ({
   screenType,
   start,
   end,
+  genre
 }: {
   name: string;
   screenName: string;
   screenType: screenTypeEnum;
   start: Date;
   end: Date;
-  }) => {
+  genre: "Action" | "Drama" | "Comedy" | "Sci-Fi" | "Romance" | "Fantasy";
+}) => {
   const [screen] = await db
     .select()
     .from(screensTable)
@@ -43,6 +45,7 @@ export const createShowService = async ({
         showStart: start,
         showEnd: end,
         showDuration: String((Number(end) - Number(start)) / (1000 * 60 * 60)),
+        showGenre: genre
       })
       .returning();
 
@@ -78,6 +81,7 @@ export const getShowsService = async ({
       screenId: screensTable.screenId,
       screenName: screensTable.screenName,
       screenType: screensTable.screenType,
+      showGenre: showsTable.showGenre,
     })
     .from(showsTable)
     .innerJoin(screensTable, eq(showsTable.screenId, screensTable.screenId))

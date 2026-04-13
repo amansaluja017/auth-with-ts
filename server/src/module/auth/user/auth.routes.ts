@@ -39,7 +39,7 @@ router.get(
   validateUserMiddleware,
   customerController.customerProfile,
 );
-router.put("/avatar", validateUserMiddleware, upload.single("avatar"), customerController.uploadAvatar);
+router.put("/profile/avatar", validateUserMiddleware, upload.single("avatar"), customerController.uploadAvatar);
 router.get(
   "/tickets",
   validateUserMiddleware,

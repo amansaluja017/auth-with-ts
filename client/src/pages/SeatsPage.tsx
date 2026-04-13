@@ -1,16 +1,87 @@
-import { Link, useParams } from 'react-router-dom';
-import type { Show } from '../App';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { ShowsTypes } from './HomePage';
 
-interface SeatsPageProps {
-  shows: Show[];
-}
+interface SeatsTypes {
+  screenId: string;
+  screenName: string;
+  screenType: string;
+  seatId: string;
+  seatName: string;
+  seatPrice: number;
+  seatStatus: string;
+  seatType: string;
+  showId: string;
+  showName: string;
+  showGenre: string;
+};
 
-const seatRows = 5;
-const seatColumns = 8;
+function SeatsPage() {
+  const { showId } = useParams<{ showId: string }>();
+  const navigate = useNavigate();
+  const { userData: user, status } = useSelector((state: any) => state.user);
+  const [show, setShow] = useState<Omit<ShowsTypes, "screenName" | "screenType">>();
+  
+  const [seats, setSeats] = useState<SeatsTypes[] | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const [booking, setBooking] = useState(false);
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const fetchSeats = async () => {
+      setLoading(true);
+      const response = await axios.get(`${import.meta.env.VITE_API_ENDPOINT}/seats/${showId}`);
+      setShow(response.data.data.show);
+      setSeats(response.data.data.seats as SeatsTypes[]);
+      setLoading(false);
+    };
+    fetchSeats();
+  }, [showId]);
+  
+  const handleSeatToggle = (seatId: string, isBooked: boolean) => {
+    if (isBooked) return;
 
-function SeatsPage({ shows }: SeatsPageProps) {
-  const { id } = useParams<{ id: string }>();
-  const show = shows.find((item) => item.id === id);
+    setSelectedSeats((prev) =>
+      prev.includes(seatId)
+        ? prev.filter((id) => id !== seatId)
+        : [...prev, seatId],
+    );
+  };
+
+  const handleBook = async () => {
+    if (!showId || !selectedSeats.length) return;
+    if (!status || !user?.token) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setBooking(true);
+      await axios.put(
+        `${import.meta.env.VITE_API_ENDPOINT}/${showId}`,
+        { seatIds: selectedSeats },
+        {
+          withCredentials: true,
+          headers: { authorization: `Bearer ${user.token}` },
+        },
+      );
+      alert('Seats booked successfully');
+      setSelectedSeats([]);
+      window.location.reload();
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error) && error.response?.data?.message) {
+        alert(error.response.data.message);
+      } else if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('Booking failed. Please try again.');
+      }
+    } finally {
+      setBooking(false);
+    }
+  };
 
   if (!show) {
     return (
@@ -25,17 +96,15 @@ function SeatsPage({ shows }: SeatsPageProps) {
     );
   }
 
-  const bookedSeats = new Set(['A2', 'A3', 'B5', 'C1', 'D7', 'E4']);
-
   return (
     <main className="min-h-screen px-4 py-10">
       <div className="mx-auto max-w-6xl space-y-8">
         <header className="rounded-[2rem] border border-slate-700 bg-slate-900/90 p-8 shadow-glow backdrop-blur-xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">{show.venue}</p>
-              <h1 className="mt-2 text-3xl font-semibold text-slate-100">{show.title}</h1>
-              <p className="mt-2 text-slate-400">{show.time}</p>
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">{show?.showDuration.split(".")[0]}h {show?.showDuration.split(".")[1]}m</p>
+              <h1 className="mt-2 text-3xl font-semibold text-slate-100">{show?.showName}</h1>
+              <p className="mt-2 text-slate-400">{new Date(show?.showStart!).toLocaleString()}</p>
             </div>
             <Link
               to="/"
@@ -58,29 +127,32 @@ function SeatsPage({ shows }: SeatsPageProps) {
             </div>
 
             <div className="grid gap-3 rounded-[1.75rem] bg-slate-950/80 p-6">
-              {Array.from({ length: seatRows }).map((_, rowIndex) => (
-                <div key={rowIndex} className="grid grid-cols-8 gap-3">
-                  {Array.from({ length: seatColumns }).map((__, colIndex) => {
-                    const seatCode = `${String.fromCharCode(65 + rowIndex)}${colIndex + 1}`;
-                    const isBooked = bookedSeats.has(seatCode);
+              <div>
+                <div className="grid grid-cols-8 gap-3">
+                  {seats?.map((seat, _) => {
+                    const isBooked = seat.seatStatus === 'booked';
+                    const isSelected = selectedSeats.includes(seat.seatId);
                     return (
                       <button
-                        key={seatCode}
+                        key={seat.seatId}
                         type="button"
+                        onClick={() => handleSeatToggle(seat.seatId, isBooked)}
                         className={
                           `rounded-2xl border px-2 py-3 text-sm font-semibold transition focus:outline-none ` +
                           (isBooked
                             ? 'cursor-not-allowed bg-rose-500/90 text-slate-950 border-rose-400'
+                            : isSelected
+                            ? 'bg-cyan-500/90 text-slate-950 border-cyan-300'
                             : 'bg-slate-800 text-slate-100 border-slate-700 hover:bg-cyan-500/90 hover:text-slate-950')
                         }
-                        disabled={isBooked}
+                        disabled={isBooked || booking}
                       >
-                        {seatCode}
+                        {seat.seatName}
                       </button>
                     );
                   })}
                 </div>
-              ))}
+              </div>
             </div>
           </div>
 
@@ -92,19 +164,43 @@ function SeatsPage({ shows }: SeatsPageProps) {
             <div className="mt-8 space-y-4 rounded-3xl bg-slate-950/80 p-6 text-slate-300">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-400">Show</span>
-                <span className="font-medium text-slate-100">{show.title}</span>
+                <span className="font-medium text-slate-100">{show?.showName}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-400">Venue</span>
-                <span className="font-medium text-slate-100">{show.venue}</span>
+                <span className="text-sm text-slate-400">Duration</span>
+                <span className="font-medium text-slate-100">{show?.showDuration.split(".")[0]}h {show?.showDuration.split(".")[1]}m</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-400">Time</span>
-                <span className="font-medium text-slate-100">{show.time}</span>
+                <span className="font-medium text-slate-100">{new Date(show?.showStart!).toLocaleTimeString()} - {new Date(show?.showEnd!).toLocaleTimeString()}</span>
               </div>
               <div className="flex items-center justify-between rounded-3xl bg-slate-900 px-4 py-4 text-slate-100">
-                <span className="text-sm">Remaining seats</span>
-                <span className="text-lg font-semibold">{show.availableSeats}</span>
+                <span className="text-sm">Genre</span>
+                <span className="text-lg font-semibold">{show?.showGenre}</span>
+              </div>
+            </div>
+
+            <div className="mt-8 rounded-3xl bg-slate-950/80 p-6 text-slate-300">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-400">Selected seats</span>
+                  <span className="font-medium text-slate-100">{selectedSeats.length}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-slate-400">Total price</span>
+                  <span className="font-medium text-slate-100">₹{selectedSeats.reduce((sum, seatId) => {
+                    const found = seats?.find((seat) => seat.seatId === seatId);
+                    return sum + (found?.seatPrice ?? 0);
+                  }, 0)}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleBook}
+                  disabled={!selectedSeats.length || booking}
+                  className="w-full rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
+                >
+                  {booking ? 'Booking...' : 'Book selected seats'}
+                </button>
               </div>
             </div>
           </aside>

@@ -11,17 +11,15 @@ import ApiError from "../../common/utils/api-error";
 import { and } from "drizzle-orm";
 
 export const getSeatsService = async ({
-  screenId,
   showId,
 }: {
-  screenId: string;
   showId: string;
 }) => {
   const [show] = await db
     .select()
     .from(showsTable)
     .where(
-      and(eq(showsTable.showId, showId), eq(showsTable.screenId, screenId)),
+      and(eq(showsTable.showId, showId), eq(showsTable.showId, showId)),
     );
 
   if (!show) throw ApiError.badRequest("Invaid request, no show found");
@@ -48,7 +46,7 @@ export const getSeatsService = async ({
       "Internal Error: Failed to fetch seats, try again later after some time",
     );
 
-  return seats;
+  return {seats, show};
 };
 
 export const bookSeatsService = async ({
@@ -85,6 +83,6 @@ export const bookSeatsService = async ({
         ),
       );
 
-    await tx.insert(ticketTable).values({ userId });
+    await tx.insert(ticketTable).values(seatIds.map((seatId) => ({ userId, seatId, showId })));
   });
 };

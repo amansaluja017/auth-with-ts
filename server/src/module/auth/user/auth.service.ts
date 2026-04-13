@@ -150,6 +150,7 @@ export const loginCustomerService = async (
       role: usersTable.role,
       id: usersTable.id,
       isVerified: usersTable.isVerified,
+      avatar: usersTable.avatar,
     })
     .from(usersTable)
     .where(eq(usersTable.email, email));
@@ -184,7 +185,7 @@ export const loginCustomerService = async (
   if (!token)
     throw ApiError.internalError("Internal Error: Failed to login user");
 
-  return { user: user, accessToken, refreshToken };
+  return { user, accessToken, refreshToken };
 };
 
 export const logoutCustomerService = async (
@@ -384,6 +385,8 @@ export const uploadAvatarService = async ({
     .returning();
 
   if (!user) throw ApiError.notFound();
+  
+  return user.avatar
 };
 
 export const getCustomerTicketsService = async ({ id }: { id: string }) => {

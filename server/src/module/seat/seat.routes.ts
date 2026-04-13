@@ -5,10 +5,10 @@ import { validateUserMiddleware, verifyJwt } from "../auth/user/auth.middleware"
 const router = express.Router();
 
 router.get(
-  "/seats/:showId/:screenId",
+  "/seats/:showId/",
   seatController.getSeats,
 );
 
-router.put("/", verifyJwt, validateUserMiddleware, seatController.bookSeats);
+router.put("/:showId", verifyJwt, validateUserMiddleware, seatController.bookSeats);
 
 export default router;

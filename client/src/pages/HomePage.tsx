@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../slice/authSlice";
 import { useEffect, useState } from "react";
 
-interface ShowsTypes {
+export interface ShowsTypes {
   screenId: string;
   screenName: string;
   screenType: string;
@@ -15,6 +15,20 @@ interface ShowsTypes {
   showStart: string;
   showEnd: string;
   showName: string;
+  showGenre: string;
+}
+
+export function convertDate(date: string | undefined) {
+  if (!date) return "";
+  return new Date(date).toLocaleString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+    second: "numeric",
+    hour12: true,
+  });
 }
 
 function HomePage() {
@@ -24,18 +38,6 @@ function HomePage() {
   const [hasNextPage, setHasNextPage] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  function convertDate(date: string) {
-    return new Date(date).toLocaleString("en-IN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      second: "numeric",
-      hour12: true,
-    });
-  }
 
   const handlePreviousPage = () => {
     setPage((prev) => Math.max(prev - 1, 1));
@@ -78,7 +80,6 @@ function HomePage() {
           `${import.meta.env.VITE_API_ENDPOINT}/?limit=10&page=${page}`,
           {
             withCredentials: true,
-            headers: { authorization: `Bearer ${user.token}` },
           },
         );
         const data = response.data.data as ShowsTypes[];
@@ -92,7 +93,7 @@ function HomePage() {
       }
     }
     loadShows();
-  }, [page, user.token]);
+  }, [page]);
 
   return (
     <main className="min-h-screen px-4 py-10">
@@ -102,7 +103,7 @@ function HomePage() {
             <span className="flex h-3.5 w-3.5 rounded-full bg-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.25)]" />
             <div>
               <p className="text-xs uppercase tracking-[0.35em] text-cyan-300">
-                CinePulse
+                Book my ticket
               </p>
               <p className="text-sm text-slate-400">
                 Premium movie seat booking
@@ -199,7 +200,7 @@ function HomePage() {
                   </div>
                   <div className="mt-5 flex flex-wrap items-center gap-3 text-sm text-slate-400">
                     <span className="rounded-2xl bg-slate-900 px-3 py-2">
-                      category
+                      {show.showGenre}
                     </span>
                     <span className="rounded-2xl bg-slate-900 px-3 py-2">
                       {show.showDuration.split(".")[0]}h {show.showDuration.split(".")[1]}m
@@ -207,7 +208,7 @@ function HomePage() {
                   </div>
                   <div className="mt-6 flex items-center justify-end gap-4">
                     <Link
-                      to={`/shows/${show.showId}/seats`}
+                      to={`/shows/${show.showId}`}
                       className="rounded-2xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition group-hover:bg-cyan-400"
                     >
                       View seats

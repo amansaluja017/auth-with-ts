@@ -50,6 +50,7 @@ export const loginCustomer = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
+      avatar: user.avatar
     },
     accessToken,
   });
@@ -108,9 +109,9 @@ export const uploadAvatar = async (req: Request, res: Response) => {
   const { path } = req.file;
   const { id } = req.customer;
 
-  await uploadAvatarService({ path, id });
+  const avatar = await uploadAvatarService({ path, id });
 
-  ApiResponse.ok(res, "avatar uploaded successfully");
+  ApiResponse.ok(res, "avatar uploaded successfully", avatar);
 };
 
 export const getCustomerTickets = async (req: Request, res: Response) => {
