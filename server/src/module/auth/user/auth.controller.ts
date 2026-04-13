@@ -11,6 +11,7 @@ import {
   newPasswordService,
   customerProfileService,
   getCustomerTicketsService,
+  uploadAvatarService,
 } from "./auth.service";
 
 export const registerCustomer = async (req: Request, res: Response) => {
@@ -43,13 +44,22 @@ export const loginCustomer = async (req: Request, res: Response) => {
   res.cookie("refreshToken", refreshToken);
 
   ApiResponse.ok(res, "user login successfully", {
-    user,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    },
     accessToken,
   });
 };
 
 export const logoutCustomer = async (req: Request, res: Response) => {
-  await logoutCustomerService(req.customer, req.cookies?.refreshToken as string);
+  await logoutCustomerService(
+    req.customer,
+    req.cookies?.refreshToken as string,
+  );
 
   res.clearCookie("refreshToken");
   ApiResponse.ok(res, "user logout successfully!");
@@ -76,6 +86,7 @@ export const customerProfile = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
+  if (req.cookies.refreshToken) throw ApiError.badRequest("You are already logged in");
   await forgotPasswordService(req.body);
 
   ApiResponse.ok(res, "Token is send to user's email successfully");
@@ -85,13 +96,25 @@ export const newPassword = async (
   req: Request<{ token: string }>,
   res: Response,
 ) => {
+  if (req.cookies.refreshToken) throw ApiError.badRequest("You are already logged in");
   await newPasswordService(req.body, req.params.token);
 
   ApiResponse.ok(res, "Password reset successfully");
 };
 
+export const uploadAvatar = async (req: Request, res: Response) => {
+  if (!req.file?.path) throw ApiError.badRequest("invalid file path");
+
+  const { path } = req.file;
+  const { id } = req.customer;
+
+  await uploadAvatarService({ path, id });
+
+  ApiResponse.ok(res, "avatar uploaded successfully");
+};
+
 export const getCustomerTickets = async (req: Request, res: Response) => {
   const tickets = await getCustomerTicketsService(req.customer);
-  
-  ApiResponse.ok(res, "user tickets fetch successfully", tickets)
-}
+
+  ApiResponse.ok(res, "user tickets fetch successfully", tickets);
+};

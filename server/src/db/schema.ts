@@ -60,6 +60,8 @@ export const usersTable = pgTable("users", {
 
   password: varchar("password", { length: 66 }).notNull(),
   role: roleEnum("role").default("customer").notNull(),
+  
+  avatar: text("avatar"),
 
   logoutAt: timestamp("logout_at"),
 

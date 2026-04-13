@@ -3,6 +3,7 @@ import * as customerController from "./auth.controller";
 import validate from "../../../common/middleware/dto.middleware";
 import * as authDto from "../../dto/auth.dto";
 import { validateUserMiddleware } from "./auth.middleware";
+import { upload } from "../../../common/middleware/multer.middleware";
 
 const router = express.Router();
 
@@ -17,7 +18,7 @@ router.post(
   customerController.loginCustomer,
 );
 router.post("/verify/:token", customerController.verifyCustomer);
-router.get(
+router.post(
   "/logout",
   validateUserMiddleware,
   customerController.logoutCustomer,
@@ -38,6 +39,7 @@ router.get(
   validateUserMiddleware,
   customerController.customerProfile,
 );
+router.put("/avatar", validateUserMiddleware, upload.single("avatar"), customerController.uploadAvatar);
 router.get(
   "/tickets",
   validateUserMiddleware,

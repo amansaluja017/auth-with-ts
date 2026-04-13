@@ -23,6 +23,7 @@ import {
 } from "../../../common/nodemailer/emails";
 import { and } from "drizzle-orm";
 import { gt } from "drizzle-orm";
+import { uploadImage } from "../../../common/utils/cloudinary.utils";
 
 interface RegisterCutomer {
   firstName: string;
@@ -86,7 +87,7 @@ export const registerCustomerService = async (
     "Verify your email",
     verificationMail(
       `${firstName} ${lastName}`,
-      `http://localhost:3000/customer/verify/${rawToken}`,
+      `${process.env.CLIENT_API}/verification/${rawToken}`,
     ),
   ).catch(console.log);
 
@@ -310,7 +311,7 @@ export const forgotPasswordService = async (data: {
     "Forgot password",
     forgotPasswordMail(
       `${user.firstName} ${user.lastName}`,
-      `http://localhost:3000/customer/new-password/${rawToken}`,
+      `${process.env.CLIENT_API}/reset-password/${rawToken}`,
     ),
   ).catch(console.log);
 };
@@ -361,8 +362,33 @@ export const newPasswordService = async (
   }
 };
 
+export const uploadAvatarService = async ({
+  path,
+  id,
+}: {
+  path: string;
+  id: string;
+}) => {
+
+  const uploadedFile = await uploadImage(path);
+
+  if (!uploadedFile)
+    throw ApiError.internalError(
+      "Internal Error: Failed to upload image, try again after some time",
+    );
+
+  const [user] = await db
+    .update(usersTable)
+    .set({ avatar: uploadedFile })
+    .where(eq(usersTable.id, id))
+    .returning();
+
+  if (!user) throw ApiError.notFound();
+};
+
 export const getCustomerTicketsService = async ({ id }: { id: string }) => {
-  return (await db
+  return (
+    await db
       .select({
         seatType: seatsTable.seatType,
         seatName: seatsTable.seatName,
@@ -371,11 +397,15 @@ export const getCustomerTicketsService = async ({ id }: { id: string }) => {
         showStart: showsTable.showStart,
         showEnd: showsTable.showEnd,
         showDuration: showsTable.showDuration,
-        createdAt: ticketTable.createdAt
+        createdAt: ticketTable.createdAt,
       })
       .from(ticketTable)
-      .innerJoin(seatStatusTable, eq(seatStatusTable.userId, ticketTable.userId))
+      .innerJoin(
+        seatStatusTable,
+        eq(seatStatusTable.userId, ticketTable.userId),
+      )
       .innerJoin(seatsTable, eq(seatsTable.seatId, seatStatusTable.seatId))
       .innerJoin(showsTable, eq(showsTable.showId, seatStatusTable.showId))
-      .where(eq(ticketTable.userId, id))).sort((a, b) => Number(a.createdAt) - Number(b.createdAt))
+      .where(eq(ticketTable.userId, id))
+  ).sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
 };
