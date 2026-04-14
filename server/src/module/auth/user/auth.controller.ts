@@ -41,7 +41,11 @@ export const loginCustomer = async (req: Request, res: Response) => {
   );
 
   if (!user) ApiError.internalError("Internal Error: Failed to login customer");
-  res.cookie("refreshToken", refreshToken);
+  res.cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
 
   ApiResponse.ok(res, "user login successfully", {
     user: {

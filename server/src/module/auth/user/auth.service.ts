@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../db";
 import {
   seatsTable,
-  seatStatusTable,
   showsTable,
   ticketTable,
   tokensTable,

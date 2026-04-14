@@ -137,21 +137,6 @@ export const seatsTable = pgTable("seats", {
   updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
 });
 
-// export const bookingsTable = pgTable("bookings", {
-//   bookingId: uuid("booking_id").primaryKey().defaultRandom(),
-
-//   showId: uuid("show_id").references(() => showsTable.showId),
-//   amount: integer("amount").notNull(),
-
-//   userId: uuid("user_id").references(() => usersTable.id),
-
-//   bookingStatus: bookingStatusEnum("booking_status")
-//     .default("waiting")
-//     .notNull(),
-
-//   createdAt: timestamp("created_at").defaultNow().notNull(),
-// });
-
 export const seatStatusTable = pgTable(
   "seats_status",
   {
@@ -169,8 +154,6 @@ export const seatStatusTable = pgTable(
 
     userId: uuid("user_id").references(() => usersTable.id),
 
-    // bookingId: uuid("booking_id").references(() => bookingsTable.bookingId),
-
     updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
   },
   (table) => [
@@ -185,9 +168,6 @@ export const seatStatusTable = pgTable(
 export const ticketTable = pgTable("tickets", {
   ticketId: uuid("ticket_id").primaryKey().defaultRandom(),
 
-  // bookingId: uuid("booking_id")
-  //   .references(() => bookingsTable.bookingId)
-  //   .notNull(),
   userId: uuid("user_id")
     .references(() => usersTable.id, {onDelete: "cascade"})
     .notNull(),

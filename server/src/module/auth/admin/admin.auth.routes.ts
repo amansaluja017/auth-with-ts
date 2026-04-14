@@ -6,11 +6,11 @@ import { validateAdminMiddleware } from "./admin.auth.middleware";
 
 const router = express.Router();
 
-router.post(
-  "/register",
-  validate(adminDto.RegisterDto),
-  adminController.registerAdmin,
-);
+// router.post(
+//   "/register",
+//   validate(adminDto.RegisterDto),
+//   adminController.registerAdmin,
+// );
 router.post("/login", validate(adminDto.LoginDto), adminController.loginAdmin);
 router.post(
   "/logout",
