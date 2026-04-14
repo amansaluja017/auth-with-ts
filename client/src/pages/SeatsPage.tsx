@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -24,10 +24,18 @@ function SeatsPage() {
   const { userData: user, status } = useSelector((state: any) => state.user);
   const [show, setShow] = useState<Omit<ShowsTypes, "screenName" | "screenType">>();
   
+  const location = useLocation();
+  
   const [seats, setSeats] = useState<SeatsTypes[] | undefined>(undefined);
   const [loading, setLoading] = useState(false);
   const [booking, setBooking] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
+  
+  function calculateTotalPrice(seats: SeatsTypes[], selectedSeats: string[]): number {
+    return seats
+      .filter((seat) => selectedSeats.includes(seat.seatId))
+      .reduce((total, seat) => total + seat.seatPrice, 0);
+  };
   
   useEffect(() => {
     const fetchSeats = async () => {
@@ -51,7 +59,8 @@ function SeatsPage() {
   };
 
   const handleBook = async () => {
-    if (!showId || !selectedSeats.length) return;
+    console.log("hit", showId, localStorage.getItem("selectedSeats"));
+    if (!showId || !localStorage.getItem("selectedSeats")) return;
     if (!status || !user?.token) {
       navigate('/login');
       return;
@@ -61,7 +70,7 @@ function SeatsPage() {
       setBooking(true);
       await axios.put(
         `${import.meta.env.VITE_API_ENDPOINT}/${showId}`,
-        { seatIds: selectedSeats },
+        { seatIds: JSON.parse(localStorage.getItem("selectedSeats")!) },
         {
           withCredentials: true,
           headers: { authorization: `Bearer ${user.token}` },
@@ -82,6 +91,15 @@ function SeatsPage() {
       setBooking(false);
     }
   };
+  
+  useEffect(() => {
+    if (location.state?.paymentStatus) {
+      console.log("payment success!");
+      handleBook();
+      localStorage.removeItem("selectedSeats");
+      location.state = null
+    }
+  }, [location.state?.paymentStatus]);
 
   if (!show) {
     return (
@@ -116,14 +134,22 @@ function SeatsPage() {
         </header>
 
         <section className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr]">
-          <div className="rounded-[2rem] border border-slate-700 bg-slate-900/90 p-8 shadow-glow">
-            <div className="mb-6 grid grid-cols-[auto_1fr] gap-3 text-sm text-slate-300">
-              <span className="inline-flex h-3 w-3 rounded-full bg-slate-700" />
-              <span>Available</span>
-              <span className="inline-flex h-3 w-3 rounded-full bg-cyan-500" />
-              <span>Selected</span>
-              <span className="inline-flex h-3 w-3 rounded-full bg-rose-500" />
-              <span>Booked</span>
+          <div className="rounded-[2rem] border border-slate-700 bg-slate-900/90 p-8 shadow-glow flex flex-col gap-10">
+            <div className="mb-6 gap-3 text-sm text-slate-300 flex justify-center">
+              <div className='flex justify-center items-center text-lg font-bold gap-3'>
+                <span className="inline-flex w-3 h-3 rounded-full bg-slate-700" />
+                <span>Available</span>
+              </div>
+              
+              <div className='flex justify-center items-center text-lg font-bold gap-3'>
+                <span className="inline-flex w-3 h-3 rounded-full bg-cyan-500" />
+                <span>Selected</span>
+              </div>
+              
+              <div className='flex justify-center items-center text-lg font-bold gap-3'>
+                <span className="inline-flex w-3 h-3 rounded-full bg-rose-500" />
+                <span>Booked</span>
+              </div>
             </div>
 
             <div className="grid gap-3 rounded-[1.75rem] bg-slate-950/80 p-6">
@@ -188,18 +214,18 @@ function SeatsPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-slate-400">Total price</span>
-                  <span className="font-medium text-slate-100">₹{selectedSeats.reduce((sum, seatId) => {
-                    const found = seats?.find((seat) => seat.seatId === seatId);
-                    return sum + (found?.seatPrice ?? 0);
-                  }, 0)}</span>
+                  <span className="font-medium text-slate-100">₹{calculateTotalPrice(seats!, selectedSeats)}</span>
                 </div>
                 <button
                   type="button"
-                  onClick={handleBook}
+                  onClick={() => {
+                    localStorage.setItem("selectedSeats", JSON.stringify(selectedSeats));
+                    navigate("/payment", { state: { amount: calculateTotalPrice(seats!, selectedSeats), showId: showId } });
+                  }}
                   disabled={!selectedSeats.length || booking}
                   className="w-full rounded-2xl bg-cyan-500 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-500"
                 >
-                  {booking ? 'Booking...' : 'Book selected seats'}
+                  {booking ? 'Booking...' : 'Proceed to Pay'}
                 </button>
               </div>
             </div>

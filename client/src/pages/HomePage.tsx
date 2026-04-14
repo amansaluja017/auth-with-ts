@@ -59,7 +59,6 @@ function HomePage() {
           headers: { authorization: `Bearer ${user.token}` },
         },
       );
-      console.log(response);
 
       if (response.status === 200) {
         dispatch(logout());
@@ -77,14 +76,14 @@ function HomePage() {
     async function loadShows() {
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_ENDPOINT}/?limit=10&page=${page}`,
+          `${import.meta.env.VITE_API_ENDPOINT}/?limit=12&page=${page}`,
           {
             withCredentials: true,
           },
         );
         const data = response.data.data as ShowsTypes[];
         setShows(data);
-        setHasNextPage(data.length === 10);
+        setHasNextPage(data.length === 12);
       } catch (error: unknown) {
         if (error instanceof Error) {
           console.error(error);

@@ -73,3 +73,9 @@ export const registerScreenService = async ({
       `);
   });
 };
+
+export const getScreensService = async () => {
+  const screens = await db.select().from(screensTable);
+  
+  return screens;
+}

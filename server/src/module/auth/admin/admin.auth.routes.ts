@@ -12,7 +12,7 @@ router.post(
   adminController.registerAdmin,
 );
 router.post("/login", validate(adminDto.LoginDto), adminController.loginAdmin);
-router.get(
+router.post(
   "/logout",
   validateAdminMiddleware,
   adminController.logoutAdmin,

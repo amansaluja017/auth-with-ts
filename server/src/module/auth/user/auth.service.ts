@@ -390,25 +390,23 @@ export const uploadAvatarService = async ({
 };
 
 export const getCustomerTicketsService = async ({ id }: { id: string }) => {
-  return (
-    await db
-      .select({
-        seatType: seatsTable.seatType,
-        seatName: seatsTable.seatName,
-        seatPrice: seatsTable.seatPrice,
-        showName: showsTable.showName,
-        showStart: showsTable.showStart,
-        showEnd: showsTable.showEnd,
-        showDuration: showsTable.showDuration,
-        createdAt: ticketTable.createdAt,
-      })
-      .from(ticketTable)
-      .innerJoin(
-        seatStatusTable,
-        eq(seatStatusTable.userId, ticketTable.userId),
-      )
-      .innerJoin(seatsTable, eq(seatsTable.seatId, seatStatusTable.seatId))
-      .innerJoin(showsTable, eq(showsTable.showId, seatStatusTable.showId))
-      .where(eq(ticketTable.userId, id))
-  ).sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
+  
+  const tickets = await db
+    .select({
+      seatType: seatsTable.seatType,
+      seatName: seatsTable.seatName,
+      seatPrice: seatsTable.seatPrice,
+      showName: showsTable.showName,
+      showStart: showsTable.showStart,
+      showEnd: showsTable.showEnd,
+      showDuration: showsTable.showDuration,
+      createdAt: ticketTable.createdAt,
+      ticketId: ticketTable.ticketId
+    })
+    .from(ticketTable)
+    .innerJoin(showsTable, eq(showsTable.showId, ticketTable.showId))
+    .innerJoin(seatsTable, eq(seatsTable.seatId, ticketTable.seatId))
+    .where(eq(ticketTable.userId, id));
+
+  return tickets.sort((a, b) => Number(a.createdAt) - Number(b.createdAt));
 };

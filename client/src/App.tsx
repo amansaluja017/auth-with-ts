@@ -7,8 +7,9 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import NewPasswordPage from './pages/NewPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import VerificationPage from './pages/VerificationPage';
-
-
+import PaymentPage from './pages/PaymentPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminPanelPage from './pages/AdminPanelPage';
 
 function App() {
   return (
@@ -21,7 +22,10 @@ function App() {
         <Route path="/verification/:token" element={<VerificationPage />} />
         <Route path="/reset-password/:token" element={<NewPasswordPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/payment" element={<PaymentPage />} />
         <Route path="/shows/:showId" element={<SeatsPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminPanelPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

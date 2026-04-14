@@ -4,11 +4,12 @@ import cors from "cors";
 import authRouter from "./auth/user/auth.routes";
 import adminRouter from "./auth/admin/admin.auth.routes";
 import cookieParser from "cookie-parser";
-import { verifyJwt } from "./auth/user/auth.middleware";
+import { validateUserMiddleware, verifyJwt } from "./auth/user/auth.middleware";
 import { adminVerifyJwt, validateAdminMiddleware } from "./auth/admin/admin.auth.middleware";
 import screenRoutes from "./screen/screen.routes";
 import showRoutes from "./show/show.routes";
 import seatRoutes from "./seat/seat.routes";
+import paymentRoutes from "./payment/payment.routes";
 
 function createExpressServer(): Express {
   const app = express();
@@ -24,6 +25,7 @@ function createExpressServer(): Express {
   app.use("/screen", adminVerifyJwt, validateAdminMiddleware, screenRoutes);
   app.use("/", showRoutes);
   app.use("/", seatRoutes);
+  app.use("/payment", verifyJwt, paymentRoutes);
 
   return app;
 }

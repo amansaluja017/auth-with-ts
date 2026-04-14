@@ -30,7 +30,13 @@ export const loginAdmin = async (req: Request, res: Response) => {
   res.cookie("refreshToken", refreshToken);
 
   ApiResponse.ok(res, "user login successfully", {
-    user,
+    user: {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    },
     accessToken,
   });
 };

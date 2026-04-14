@@ -1,25 +1,19 @@
 import { and, asc } from "drizzle-orm";
 import { db } from "../../db";
-import {
-  screensTable,
-  showsTable,
-} from "../../db/schema";
+import { screensTable, showsTable } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { screenTypeEnum } from "../screen/screen.service";
 import ApiError from "../../common/utils/api-error";
 import { sql } from "drizzle-orm";
 
 export const createShowService = async ({
   name,
-  screenName,
-  screenType,
+  screenId,
   start,
   end,
-  genre
+  genre,
 }: {
   name: string;
-  screenName: string;
-  screenType: screenTypeEnum;
+  screenId: string;
   start: Date;
   end: Date;
   genre: "Action" | "Drama" | "Comedy" | "Sci-Fi" | "Romance" | "Fantasy";
@@ -28,10 +22,7 @@ export const createShowService = async ({
     .select()
     .from(screensTable)
     .where(
-      and(
-        eq(screensTable.screenName, screenName),
-        eq(screensTable.screenType, screenType),
-      ),
+      eq(screensTable.screenId, screenId),
     );
 
   if (!screen) throw ApiError.notFound("Screen not found");
@@ -45,7 +36,7 @@ export const createShowService = async ({
         showStart: start,
         showEnd: end,
         showDuration: String((Number(end) - Number(start)) / (1000 * 60 * 60)),
-        showGenre: genre
+        showGenre: genre,
       })
       .returning();
 

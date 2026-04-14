@@ -39,6 +39,7 @@ export const paymentMethodEnum = pgEnum("payment_method", [
   "upi",
   "card",
   "netbanking",
+  "wallet",
 ]);
 export const screenTypeEnum = pgEnum("screen_type", [
   "IMAX",

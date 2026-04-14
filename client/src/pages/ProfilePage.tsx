@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Camera } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { Update } from "../slice/authSlice";
+import TicketsSection from "../components/TicketsSection";
+
 
 function ProfilePage() {
   const { userData: user } = useSelector((state: any) => state.user);
@@ -84,6 +86,7 @@ function ProfilePage() {
                 <label className="absolute bottom-0 right-0 bg-black text-white rounded-full p-2 cursor-pointer hover:scale-105">
                   <Camera size={20} />
                   <input
+                    title="avatar"
                     type="file"
                     className="hidden"
                     onChange={handleImageChange}
@@ -122,6 +125,8 @@ function ProfilePage() {
               </div>
             </div>
           </section>
+          
+          <TicketsSection />
         </div>
       </div>
     </main>

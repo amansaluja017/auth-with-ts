@@ -4,7 +4,6 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../slice/authSlice";
 
-
 interface loginFormData {
   email: string;
   password: string;
@@ -26,7 +25,7 @@ function LoginPage() {
 
       if (response.status === 200) {
         const data = response.data.data;
-        dispatch(login({...data.user, token: data.accessToken}));
+        dispatch(login({ ...data.user, token: data.accessToken }));
         navigate("/");
       }
     } catch (error: unknown) {
@@ -55,7 +54,14 @@ function LoginPage() {
           </label>
 
           <label className="block">
-            <span className="text-sm text-slate-300">Password</span>
+            <div className="flex justify-between">
+              <span className="text-sm text-slate-300">Password</span>
+              <Link
+                className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+                to="/forgot-password">
+                Forgot password?
+              </Link>
+            </div>
             <input
               type="password"
               required
@@ -65,32 +71,29 @@ function LoginPage() {
             />
           </label>
 
-          <div className="flex items-center justify-end">
-            <Link
-              className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
-              to="/forgot-password"
-            >
-              Forgot password?
-            </Link>
-          </div>
-
           <button
             type="submit"
-            className="w-full rounded-2xl bg-cyan-500 px-4 py-3 text-base font-semibold text-slate-950 transition hover:bg-cyan-400"
-          >
+            className="w-full rounded-2xl bg-cyan-500 px-4 py-3 text-base font-semibold text-slate-950 transition hover:bg-cyan-400">
             Login
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-slate-400">
-          New here?{" "}
+        <div className="flex justify-around items-center mt-6">
+          <p className="text-center text-sm text-slate-400">
+            New here?{" "}
+            <Link
+              className="font-medium text-cyan-300 hover:text-cyan-200"
+              to="/register">
+              Create an account
+            </Link>
+          </p>
+
           <Link
-            className="font-medium text-cyan-300 hover:text-cyan-200"
-            to="/register"
-          >
-            Create an account
+            className="font-medium text-sm text-red-600 hover:opacity-80 hover:underline"
+            to="/admin/login">
+            Admin login
           </Link>
-        </p>
+        </div>
       </section>
     </main>
   );

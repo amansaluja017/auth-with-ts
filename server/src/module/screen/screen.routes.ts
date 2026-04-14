@@ -10,5 +10,6 @@ router.post(
   validate(screenDto.RegisterDto),
   screenController.registerScreen,
 );
+router.get("/", screenController.getScreens);
 
 export default router;
