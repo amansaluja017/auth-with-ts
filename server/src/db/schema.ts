@@ -148,6 +148,7 @@ export const seatStatusTable = pgTable(
     lockExpiry: timestamp("lock_expiry"),
 
     userId: uuid("user_id").references(() => usersTable.id),
+    paymentId: uuid("payment_id").references(() => paymentTable.paymentId, { onDelete: "cascade" }),
 
     updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
   },
@@ -165,6 +166,10 @@ export const ticketTable = pgTable("tickets", {
 
   userId: uuid("user_id")
     .references(() => usersTable.id, {onDelete: "cascade"})
+    .notNull(),
+  
+  paymentId: uuid("payment_id")
+    .references(() => paymentTable.paymentId, {onDelete: "cascade"})
     .notNull(),
   
   showId: uuid("show_id")

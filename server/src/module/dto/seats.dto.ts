@@ -5,6 +5,7 @@ class SeatsDto extends BaseDto {
   static schema = z
     .object({
       seatIds: z.array(z.string()).nonempty().min(1),
+      paymentId: z.string(),
     })
     .strict();
 }

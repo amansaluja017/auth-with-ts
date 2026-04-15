@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Camera } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { Update } from "../slice/authSlice";
-import TicketsSection from "../components/TicketsSection";
+import BookingSection from "../components/BookingsSection";
 
 function ProfilePage() {
   const { userData: user } = useSelector((state: any) => state.user);
@@ -113,7 +113,7 @@ function ProfilePage() {
             </div>
           </section>
           
-          <TicketsSection />
+          <BookingSection />
         </div>
       </div>
     </main>

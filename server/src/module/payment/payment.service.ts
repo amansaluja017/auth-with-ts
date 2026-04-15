@@ -4,7 +4,7 @@ import crypto from "node:crypto";
 import { db } from "../../db";
 import { invoiceTable, paymentTable } from "../../db/schema";
 
-type PaymentMethod = "upi" | "card" | "netbanking" | "wallet";
+// type PaymentMethod = "upi" | "card" | "netbanking" | "wallet";
 
 export const createPaymentService = async ({
   amount,
@@ -43,7 +43,7 @@ export const verifyPaymentService = async ({
   orderId: string;
   paymentId: string;
   signature: string;
-}, customerId: string) => {
+}) => {
   try {
     
     const hmac = crypto.createHmac("sha256", process.env.ROZARPAY_TEST_API_KEY_SECRET!);
@@ -54,24 +54,24 @@ export const verifyPaymentService = async ({
       throw ApiError.internalError("Failed to verify payment");
     }
     
-    const payment = await razorpay.payments.fetch(paymentId);
+    // const payment = await razorpay.payments.fetch(paymentId);
     
-    if (payment.status !== "captured") {
-      throw ApiError.internalError("Payment not captured");
-    }
+    // if (payment.status !== "captured") {
+    //   throw ApiError.internalError("Payment not captured");
+    // }
     
-    const [paymentData] = await db.insert(paymentTable).values({
-      userId: customerId,
-      transactionId: payment.id,
-      paymentMethod: payment.method as PaymentMethod,
-      amount: Number(payment.amount) / 100,
-      paymentStatus: "success",
-    }).returning();
+    // const [paymentData] = await db.insert(paymentTable).values({
+    //   userId: customerId,
+    //   transactionId: payment.id,
+    //   paymentMethod: payment.method as PaymentMethod,
+    //   amount: Number(payment.amount) / 100,
+    //   paymentStatus: "success",
+    // }).returning();
     
-    await db.insert(invoiceTable).values({
-      userId: customerId,
-      paymentId: paymentData?.paymentId!
-    });
+    // await db.insert(invoiceTable).values({
+    //   userId: customerId,
+    //   paymentId: paymentData?.paymentId!
+    // });
         
   } catch (error: unknown) {
     if (error instanceof Error) {

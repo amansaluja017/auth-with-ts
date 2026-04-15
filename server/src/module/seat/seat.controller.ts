@@ -20,12 +20,12 @@ export const bookSeats = async (
 ) => {
   const { id: userId } = req.customer;
   const { showId } = req.params;
-  const { seatIds }: { seatIds: string[] } = req.body;
+  const { seatIds, paymentId }: { seatIds: string[]; paymentId: string } = req.body;
 
   if (!seatIds || !seatIds.length)
     throw ApiError.badRequest("seat id is Invalid");
 
-  await bookSeatsService({ seatIds, showId, userId });
+  await bookSeatsService({ seatIds, showId, userId, paymentId });
 
   ApiResponse.ok(res, "Your seat is booked");
 };

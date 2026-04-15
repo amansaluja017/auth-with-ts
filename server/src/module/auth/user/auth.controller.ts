@@ -12,6 +12,7 @@ import {
   customerProfileService,
   getCustomerTicketsService,
   uploadAvatarService,
+  getCustomerBookingsService,
 } from "./auth.service";
 
 export const registerCustomer = async (req: Request, res: Response) => {
@@ -54,7 +55,7 @@ export const loginCustomer = async (req: Request, res: Response) => {
       firstName: user.firstName,
       lastName: user.lastName,
       role: user.role,
-      avatar: user.avatar
+      avatar: user.avatar,
     },
     accessToken,
   });
@@ -91,7 +92,8 @@ export const customerProfile = async (req: Request, res: Response) => {
 };
 
 export const forgotPassword = async (req: Request, res: Response) => {
-  if (req.cookies.refreshToken) throw ApiError.badRequest("You are already logged in");
+  if (req.cookies.refreshToken)
+    throw ApiError.badRequest("You are already logged in");
   await forgotPasswordService(req.body);
 
   ApiResponse.ok(res, "Token is send to user's email successfully");
@@ -101,7 +103,8 @@ export const newPassword = async (
   req: Request<{ token: string }>,
   res: Response,
 ) => {
-  if (req.cookies.refreshToken) throw ApiError.badRequest("You are already logged in");
+  if (req.cookies.refreshToken)
+    throw ApiError.badRequest("You are already logged in");
   await newPasswordService(req.body, req.params.token);
 
   ApiResponse.ok(res, "Password reset successfully");
@@ -118,8 +121,16 @@ export const uploadAvatar = async (req: Request, res: Response) => {
   ApiResponse.ok(res, "avatar uploaded successfully", avatar);
 };
 
-export const getCustomerTickets = async (req: Request, res: Response) => {
-  const tickets = await getCustomerTicketsService(req.customer);
+export const getCustomerTickets = async (req: Request<{ paymentId: string }>, res: Response) => {
+  if (!req.params.paymentId) throw ApiError.badRequest("paymentId is required");
+  
+  const tickets = await getCustomerTicketsService({ id: req.customer.id, paymentId: req.params.paymentId });
 
   ApiResponse.ok(res, "user tickets fetch successfully", tickets);
+};
+
+export const getCustomerBookings = async (req: Request, res: Response) => {
+  const bookings = await getCustomerBookingsService(req.customer);
+
+  ApiResponse.ok(res, "user bookings fetch successfully", bookings);
 };

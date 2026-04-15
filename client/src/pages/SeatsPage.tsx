@@ -58,7 +58,7 @@ function SeatsPage() {
     );
   };
 
-  const handleBook = async () => {
+  const handleBook = async (paymentId: string) => {
     if (!showId || !localStorage.getItem("selectedSeats")) return;
     if (!status || !user?.token) {
       navigate('/login');
@@ -69,7 +69,7 @@ function SeatsPage() {
       setBooking(true);
       await axios.put(
         `${import.meta.env.VITE_API_ENDPOINT}/${showId}`,
-        { seatIds: JSON.parse(localStorage.getItem("selectedSeats")!) },
+        { seatIds: JSON.parse(localStorage.getItem("selectedSeats")!), paymentId },
         {
           withCredentials: true,
           headers: { authorization: `Bearer ${user.token}` },
@@ -93,11 +93,11 @@ function SeatsPage() {
   
   useEffect(() => {
     if (location.state?.paymentStatus) {
-      handleBook();
+      handleBook(location.state.paymentId);
       localStorage.removeItem("selectedSeats");
       location.state = null
     }
-  }, [location.state?.paymentStatus]);
+  }, [location.state?.paymentStatus, location.state?.paymentId]);
 
   if (!show) {
     return (

@@ -13,6 +13,7 @@ import AdminPanelPage from './pages/AdminPanelPage';
 import AdminScreenShowsPage from './pages/AdminScreenShowsPage';
 import Protected from './components/Protected';
 import UserProtected from './components/UserProtected';
+import CustomerTicketsPage from './pages/CustomerTicketsPage';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/reset-password/:token" element={<NewPasswordPage />} />
         <Route path="/profile" element={<UserProtected><ProfilePage /></UserProtected>} />
         <Route path="/payment" element={<UserProtected><PaymentPage /></UserProtected>} />
+        <Route path="/tickets/:paymentId" element={<UserProtected><CustomerTicketsPage /></UserProtected>} />
         <Route path="/shows/:showId" element={<SeatsPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<Protected><AdminPanelPage /></Protected>} />

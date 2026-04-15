@@ -1,7 +1,9 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../db";
 import {
+  paymentTable,
   seatsTable,
+  seatStatusTable,
   showsTable,
   ticketTable,
   tokensTable,
@@ -369,7 +371,6 @@ export const uploadAvatarService = async ({
   path: string;
   id: string;
 }) => {
-
   const uploadedFile = await uploadImage(path);
 
   if (!uploadedFile)
@@ -384,12 +385,11 @@ export const uploadAvatarService = async ({
     .returning();
 
   if (!user) throw ApiError.notFound();
-  
-  return user.avatar
+
+  return user.avatar;
 };
 
-export const getCustomerTicketsService = async ({ id }: { id: string }) => {
-  
+export const getCustomerTicketsService = async ({ id, paymentId }: { id: string, paymentId: string }) => {
   const tickets = await db
     .select({
       seatType: seatsTable.seatType,
@@ -399,12 +399,22 @@ export const getCustomerTicketsService = async ({ id }: { id: string }) => {
       showStart: showsTable.showStart,
       showEnd: showsTable.showEnd,
       createdAt: ticketTable.createdAt,
-      ticketId: ticketTable.ticketId
+      ticketId: ticketTable.ticketId,
     })
     .from(ticketTable)
     .innerJoin(showsTable, eq(showsTable.showId, ticketTable.showId))
     .innerJoin(seatsTable, eq(seatsTable.seatId, ticketTable.seatId))
-    .where(eq(ticketTable.userId, id));
+    .innerJoin(paymentTable, eq(paymentTable.paymentId, ticketTable.paymentId))
+    .where(and(eq(ticketTable.paymentId, paymentId), eq(ticketTable.userId, id)));
 
   return tickets.sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
+};
+
+export const getCustomerBookingsService = async ({ id }: { id: string }) => {
+  const bookings = await db
+    .select()
+    .from(paymentTable)
+    .where(eq(paymentTable.userId, id))
+
+  return bookings;
 };

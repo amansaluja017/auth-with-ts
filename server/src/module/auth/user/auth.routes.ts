@@ -41,9 +41,14 @@ router.get(
 );
 router.put("/profile/avatar", validateUserMiddleware, upload.single("avatar"), customerController.uploadAvatar);
 router.get(
-  "/tickets",
+  "/tickets/:paymentId",
   validateUserMiddleware,
   customerController.getCustomerTickets,
+);
+router.get(
+  "/bookings",
+  validateUserMiddleware,
+  customerController.getCustomerBookings,
 );
 
 export default router;

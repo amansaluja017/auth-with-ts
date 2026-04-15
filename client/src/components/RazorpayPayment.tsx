@@ -87,7 +87,8 @@ function RazarpayPayment() {
             );
 
             if (verifyResponse.status === 200) {
-              navigate(`/shows/${showId}`, { state: { paymentStatus: true } });
+              console.log(response.razorpay_payment_id)
+              navigate(`/shows/${showId}`, { state: { paymentStatus: true, paymentId: response.razorpay_payment_id } });
 
               const successMessage = document.createElement("div");
               successMessage.className =

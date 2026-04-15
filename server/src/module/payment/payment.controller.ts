@@ -11,9 +11,8 @@ export const createPayment = async (req: Request, res: Response) => {
 };
 
 export const verifyPayment = async (req: Request, res: Response) => {
-  console.log(req.customer);
   
-  await verifyPaymentService(req.body, req.customer.id);
+  await verifyPaymentService(req.body);
   
   ApiResponse.ok(res, "Payment verified successfully");
 };
