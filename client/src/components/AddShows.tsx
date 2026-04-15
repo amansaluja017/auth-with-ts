@@ -72,7 +72,7 @@ function AddShows({ screens }: { screens: ScreenType[] }) {
 
       <form className="mt-8 space-y-5" onSubmit={handleSubmit(handleAddShow)}>
         <label className="block">
-          <span className="text-sm text-slate-300">Show name</span>
+          <span className="text-md font-bold text-slate-300">Show name</span>
           <input
             required
             className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
@@ -83,9 +83,10 @@ function AddShows({ screens }: { screens: ScreenType[] }) {
 
         <div className="grid gap-4 md:grid-cols-2">
           <label className="block">
-            <span className="text-sm text-slate-300">Start time</span>
+            <span className="text-md font-bold text-slate-300">Start time</span>
             <input
               type="datetime-local"
+              min={new Date().toISOString().slice(0, 16)}
               required
               className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
               {...register("start", { required: true })}
@@ -93,9 +94,10 @@ function AddShows({ screens }: { screens: ScreenType[] }) {
           </label>
 
           <label className="block">
-            <span className="text-sm text-slate-300">End time</span>
+            <span className="text-md font-bold text-slate-300">End time</span>
             <input
               type="datetime-local"
+              min={new Date().toISOString().slice(0, 16)}
               required
               className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
               {...register("end", { required: true })}
@@ -104,7 +106,7 @@ function AddShows({ screens }: { screens: ScreenType[] }) {
         </div>
 
         <label className="block">
-          <span className="text-sm text-slate-300">Screen</span>
+          <span className="text-md font-bold text-slate-300">Screen</span>
           <select
             {...register("screenId", { required: true })}
             required
@@ -130,7 +132,7 @@ function AddShows({ screens }: { screens: ScreenType[] }) {
         </label>
 
         <label className="block">
-          <span className="text-sm text-slate-300">Show genre</span>
+          <span className="text-md font-bold text-slate-300">Show genre</span>
 
           <select
             {...register("genre", { required: true })}

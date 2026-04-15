@@ -10,6 +10,7 @@ import VerificationPage from './pages/VerificationPage';
 import PaymentPage from './pages/PaymentPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminPanelPage from './pages/AdminPanelPage';
+import AdminScreenShowsPage from './pages/AdminScreenShowsPage';
 import Protected from './components/Protected';
 import UserProtected from './components/UserProtected';
 
@@ -28,6 +29,7 @@ function App() {
         <Route path="/shows/:showId" element={<SeatsPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<Protected><AdminPanelPage /></Protected>} />
+        <Route path="/admin/screens/:screenId/shows" element={<Protected><AdminScreenShowsPage /></Protected>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

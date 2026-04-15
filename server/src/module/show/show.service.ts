@@ -21,9 +21,7 @@ export const createShowService = async ({
   const [screen] = await db
     .select()
     .from(screensTable)
-    .where(
-      eq(screensTable.screenId, screenId),
-    );
+    .where(eq(screensTable.screenId, screenId));
 
   if (!screen) throw ApiError.notFound("Screen not found");
 
@@ -54,7 +52,7 @@ export const createShowService = async ({
   });
 };
 
-export const getShowsService = async ({
+export const getShowsAllService = async ({
   page,
   limit,
 }: {
@@ -77,7 +75,31 @@ export const getShowsService = async ({
     .limit(limit - 0)
     .offset(limit * (page - 1))
     .orderBy(asc(showsTable.showStart));
-  
+
+  if (!shows)
+    throw ApiError.internalError(
+      "Internal Error: Failed to fetch shows, try again later",
+    );
+
+  return shows;
+};
+
+export const getShowsService = async ({ screenId }: { screenId: string }) => {
+  const shows = await db
+    .select({
+      showId: showsTable.showId,
+      showName: showsTable.showName,
+      showStart: showsTable.showStart,
+      showEnd: showsTable.showEnd,
+      showGenre: showsTable.showGenre,
+      screenName: screensTable.screenName,
+      screenType: screensTable.screenType,
+    })
+    .from(showsTable)
+    .innerJoin(screensTable, eq(showsTable.screenId, screensTable.screenId))
+    .where(eq(showsTable.screenId, screenId))
+    .orderBy(asc(showsTable.showStart));
+
   if (!shows)
     throw ApiError.internalError(
       "Internal Error: Failed to fetch shows, try again later",

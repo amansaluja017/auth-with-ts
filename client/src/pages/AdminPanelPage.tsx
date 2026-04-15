@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../slice/authSlice";
 import AddShows from "../components/AddShows";
 import { useForm } from "react-hook-form";
+import ExistingScreens from "../components/ExistingScreens";
 
-interface ScreenType {
+export interface ScreenType {
   screenId: string;
   screenName: string;
   screenType: string;
@@ -154,7 +155,7 @@ function AdminPanelPage() {
               onSubmit={handleSubmit(handleAddScreen)}
             >
               <label className="block">
-                <span className="text-sm text-slate-300">Screen name</span>
+                <span className="text-md font-bold text-slate-300">Screen name</span>
                 <input
                   required
                   className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
@@ -164,7 +165,7 @@ function AdminPanelPage() {
               </label>
 
               <label className="block">
-                <span className="text-sm text-slate-300">Screen type</span>
+                <span className="text-md font-bold text-slate-300">Screen type</span>
                 <select
                   {...register("screenType", { required: true })}
                   className="mt-2 w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-slate-100 outline-none transition focus:border-cyan-400 focus:ring-2 focus:ring-cyan-500/20"
@@ -189,43 +190,13 @@ function AdminPanelPage() {
                 {submittingScreen ? "Adding screen..." : "Add screen"}
               </button>
             </form>
+            
           </section>
 
           <AddShows screens={screens} />
         </div>
 
-        <section className="rounded-[2rem] border border-slate-700 bg-slate-900/95 p-8 shadow-glow backdrop-blur-xl">
-          <div className="gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div className="mt-8 rounded-3xl bg-slate-950/80 p-6 text-slate-300">
-              <h3 className="text-sm uppercase tracking-[0.3em] text-cyan-300">
-                Existing screens
-              </h3>
-              <div className="mt-4 space-y-3 grid grid-cols-4 gap-3">
-                {loadingScreens ? (
-                  <div className="text-slate-400">Loading screens...</div>
-                ) : screens.length > 0 ? (
-                  screens.map((screen) => (
-                    <div
-                      key={screen.screenId}
-                      className="rounded-3xl bg-slate-900 mt-4 p-4"
-                    >
-                      <p className="font-medium text-slate-100">
-                        {screen.screenName}
-                      </p>
-                      <p className="text-sm text-slate-400">
-                        {screen.screenType}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-slate-400">
-                    No screens registered yet.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </section>
+        <ExistingScreens screens={screens} loadingScreens={loadingScreens} />
       </div>
     </main>
   );

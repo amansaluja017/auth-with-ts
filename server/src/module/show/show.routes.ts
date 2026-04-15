@@ -17,6 +17,12 @@ router.post(
   showController.createShow,
 );
 
-router.get("/", showController.getShows);
+router.get("/", showController.getAllShows);
+router.get(
+  "/admin/show/:screenId",
+  adminVerifyJwt,
+  validateAdminMiddleware,
+  showController.getScreenShow,
+);
 
 export default router;
