@@ -1,9 +1,11 @@
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
 import PasswordInput from '../components/PasswordInput';
+import { useState } from 'react';
 
 function NewPasswordPage() {
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { register, handleSubmit } = useForm<{ newPassword: string, confirmPassword: string }>();
   const { token } = useParams();
@@ -16,8 +18,14 @@ function NewPasswordPage() {
       await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/customer/new-password/${token}`, data, {withCredentials: true});
       navigate('/login');
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
+      if (error instanceof AxiosError) {
+        if (error.response?.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError("Password reset failed. Please try again.");
+        }
+      } else {
+        setError("Password reset failed. Please try again.");
       }
     }
   };
@@ -45,6 +53,10 @@ function NewPasswordPage() {
             placeholder="Confirm new password"
             register={register('confirmPassword', { required: true })}
           />
+          
+          {error && (
+            <p className="text-sm text-red-600 font-mono font-bold">{error}</p>
+          )}
 
           <button
             type="submit"

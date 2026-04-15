@@ -1,9 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 
 function ForgotPasswordPage() {
   const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  
   const { register, handleSubmit } = useForm<{ email: string }>();
 
   const submit = async (data: { email: string }) => {
@@ -11,9 +14,10 @@ function ForgotPasswordPage() {
       await axios.post(`${import.meta.env.VITE_API_ENDPOINT}/customer/forgot-password`, { email: data.email }, {withCredentials: true});
       navigate('/');
     } catch (error: unknown) {
-      console.log(error);
-      if (error instanceof Error) {
-        alert(error.message);
+      if (error instanceof AxiosError) {
+        if (error.response?.data.message) {
+          setError(error.response.data.message);
+        }
       }
     }
   };
@@ -40,6 +44,10 @@ function ForgotPasswordPage() {
               {...register("email", { required: true })}
             />
           </label>
+          
+          {error && (
+            <p className="text-sm text-red-600 font-mono font-bold">{error}</p>
+          )}
 
           <button
             type="submit"

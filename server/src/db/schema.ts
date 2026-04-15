@@ -110,15 +110,10 @@ export const showsTable = pgTable(
 
     showStart: timestamp("show_start").notNull(),
     showEnd: timestamp("show_end").notNull(),
-    showDuration: numeric("show_duration", {
-      precision: 10,
-      scale: 2,
-    }).notNull(),
     showGenre: showGenreEnum("show_genre").notNull(),
 
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
-  (table) => [check("show_duration", sql`${table.showDuration} > 0`)],
 );
 
 export const seatsTable = pgTable("seats", {

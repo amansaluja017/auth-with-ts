@@ -17,3 +17,11 @@ body {
     radial-gradient(circle at bottom, rgba(14, 165, 233, 0.12), transparent 30%),
     #020617;
 }
+
+.simplebar-scrollbar::before {
+  background-color: #00FFFF;
+}
+
+/*.simplebar-scrollbar:hover::before {
+  background-color: #00FF99; 
+}*/

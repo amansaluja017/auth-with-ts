@@ -1,7 +1,10 @@
+import SimpleBar from "simplebar-react";
+import "simplebar-react/dist/simplebar.min.css";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { calculateDuration } from "../pages/HomePage";
 
 interface TicketType {
   createdAt: string;
@@ -35,7 +38,7 @@ function TicketsSection() {
   }, []);
   
   return (
-    <section className="rounded-[2rem] border border-slate-700 bg-slate-900/95 p-8 shadow-glow backdrop-blur-xl">
+    <SimpleBar autoHide={false} forceVisible="y" style={{ maxHeight: 600 }} className="rounded-[2rem] border border-slate-700 bg-slate-900/95 p-8 shadow-glow backdrop-blur-xl">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">
@@ -84,20 +87,20 @@ function TicketsSection() {
                 <div className="rounded-3xl bg-slate-900 p-4">
                   <p className="text-sm text-slate-500">Duration</p>
                   <p className="mt-2 text-lg font-medium text-slate-100">
-                    {ticket.showDuration.split(".")[0]}h {ticket.showDuration.split(".")[1]}m
+                    {calculateDuration(new Date(ticket.showStart), new Date(ticket.showEnd))}
                   </p>
                 </div>
                 <div className="rounded-3xl bg-slate-900 p-4">
                   <p className="text-sm text-slate-500">Show time</p>
                   <p className="mt-2 text-lg font-medium text-slate-100">
-                    {new Date(ticket.showStart).toLocaleTimeString()}-{new Date(ticket.showEnd).toLocaleTimeString()}
+                    {new Date(ticket.showStart).toLocaleTimeString("en-IN", {hour: "2-digit", minute: "2-digit"})}-{new Date(ticket.showEnd).toLocaleTimeString("en-IN", {hour: "2-digit", minute: "2-digit"})}
                   </p>
                 </div>
               </div>
             </div>
           ))}
         </div>
-    </section>
+    </SimpleBar>
   )
 }
 

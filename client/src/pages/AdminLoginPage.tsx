@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useDispatch } from "react-redux";
 import { login } from "../slice/authSlice";
 import { useForm } from "react-hook-form";
@@ -14,10 +14,11 @@ interface AdminLoginFormData {
 function AdminLoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const dispatch = useDispatch();
 
-  const { register, handleSubmit } = useForm<AdminLoginFormData>();
+  const { register, handleSubmit, reset } = useForm<AdminLoginFormData>();
 
   const submit = async (data: AdminLoginFormData) => {
     setLoading(true);
@@ -29,21 +30,24 @@ function AdminLoginPage() {
         { withCredentials: true },
       );
 
-      console.log(response);
-
       if (response.status === 200) {
         dispatch(login({...response.data.data.user, token: response.data.data.accessToken}));
       }
 
       navigate("/admin/dashboard");
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
+      if (error instanceof AxiosError) {
+        if (error.response?.data.message) {
+          setError(error.response.data.message);
+        } else {
+          setError("Admin login failed. Please try again.");
+        }
       } else {
-        alert("Admin login failed. Please try again.");
+        setError("Admin login failed. Please try again.");
       }
     } finally {
       setLoading(false);
+      reset();
     }
   };
 
@@ -80,6 +84,10 @@ function AdminLoginPage() {
             placeholder="Enter your password"
             register={register("password", { required: true })}
           />
+          
+          {error && (
+            <p className="text-sm text-red-600 font-mono font-bold">{error}</p>
+          )}
 
           <button
             type="submit"

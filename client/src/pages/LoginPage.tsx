@@ -16,9 +16,10 @@ function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { register, handleSubmit } = useForm<loginFormData>();
+  const { register, handleSubmit, reset } = useForm<loginFormData>();
 
   const submit = async (data: loginFormData) => {
+    setError("");
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_ENDPOINT}/customer/login`,
@@ -33,16 +34,14 @@ function LoginPage() {
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
-        if (error.status === 401) {
-          setError("Email or password is incorrect");
-        } else if (error.status === 404) {
-          setError("User not found");
-        } else {
-          setError(error.message);
+        if (error.response?.data.message) {
+          setError(error.response.data.message);
         }
       } else {
         alert(error instanceof Error ? error.message : String(error));
       }
+    } finally {
+      reset();
     }
   };
 

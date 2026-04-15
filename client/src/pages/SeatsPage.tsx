@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { ShowsTypes } from './HomePage';
+import { calculateDuration, convertDate, ShowsTypes } from './HomePage';
 
 interface SeatsTypes {
   screenId: string;
@@ -59,7 +59,6 @@ function SeatsPage() {
   };
 
   const handleBook = async () => {
-    console.log("hit", showId, localStorage.getItem("selectedSeats"));
     if (!showId || !localStorage.getItem("selectedSeats")) return;
     if (!status || !user?.token) {
       navigate('/login');
@@ -94,7 +93,6 @@ function SeatsPage() {
   
   useEffect(() => {
     if (location.state?.paymentStatus) {
-      console.log("payment success!");
       handleBook();
       localStorage.removeItem("selectedSeats");
       location.state = null
@@ -120,9 +118,9 @@ function SeatsPage() {
         <header className="rounded-[2rem] border border-slate-700 bg-slate-900/90 p-8 shadow-glow backdrop-blur-xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">{show?.showDuration.split(".")[0]}h {show?.showDuration.split(".")[1]}m</p>
+              <p className="text-sm uppercase tracking-[0.35em] text-cyan-300">{calculateDuration(new Date(show?.showStart!), new Date(show?.showEnd!))}</p>
               <h1 className="mt-2 text-3xl font-semibold text-slate-100">{show?.showName}</h1>
-              <p className="mt-2 text-slate-400">{new Date(show?.showStart!).toLocaleString()}</p>
+              <p className="mt-2 text-slate-400">{convertDate(show?.showStart)}</p>
             </div>
             <Link
               to="/"
@@ -194,11 +192,11 @@ function SeatsPage() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-400">Duration</span>
-                <span className="font-medium text-slate-100">{show?.showDuration.split(".")[0]}h {show?.showDuration.split(".")[1]}m</span>
+                <span className="font-medium text-slate-100">{calculateDuration(new Date(show?.showStart!), new Date(show?.showEnd!))}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-slate-400">Time</span>
-                <span className="font-medium text-slate-100">{new Date(show?.showStart!).toLocaleTimeString()} - {new Date(show?.showEnd!).toLocaleTimeString()}</span>
+                <span className="font-medium text-slate-100">{new Date(show?.showStart).toLocaleTimeString("en-IN", {hour: "2-digit", minute: "2-digit"})} - {new Date(show?.showEnd).toLocaleTimeString("en-IN", {hour: "2-digit", minute: "2-digit"})}</span>
               </div>
               <div className="flex items-center justify-between rounded-3xl bg-slate-900 px-4 py-4 text-slate-100">
                 <span className="text-sm">Genre</span>

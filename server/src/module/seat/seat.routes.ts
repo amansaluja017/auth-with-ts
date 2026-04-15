@@ -1,6 +1,8 @@
 import express from "express";
 import * as seatController from "./seat.controller";
 import { validateUserMiddleware, verifyJwt } from "../auth/user/auth.middleware";
+import validate from "../../common/middleware/dto.middleware";
+import { SeatsDto } from "../dto/seats.dto";
 
 const router = express.Router();
 
@@ -9,6 +11,6 @@ router.get(
   seatController.getSeats,
 );
 
-router.put("/:showId", verifyJwt, validateUserMiddleware, seatController.bookSeats);
+router.put("/:showId", validate(SeatsDto) ,verifyJwt, validateUserMiddleware, seatController.bookSeats);
 
 export default router;

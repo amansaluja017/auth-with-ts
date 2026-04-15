@@ -1,8 +1,8 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import PasswordInput from '../components/PasswordInput';
+import { useState } from 'react';
 
 interface RegisterFormData {
   firstName: string;
@@ -12,8 +12,9 @@ interface RegisterFormData {
 }
 
 function RegisterPage() {
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const { register, handleSubmit } = useForm<RegisterFormData>();
+  const { register, handleSubmit, reset } = useForm<RegisterFormData>();
   
 
   const submit = async (data: RegisterFormData) => {
@@ -26,9 +27,13 @@ function RegisterPage() {
         alert('Registration failed');
       }
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        alert(error.message);
+      if (error instanceof AxiosError) {
+        setError(error.response?.data?.message || 'Registration failed');
+      } else {
+        setError('Registration failed');
       }
+    } finally {
+      reset();
     }
   };
 
@@ -77,6 +82,10 @@ function RegisterPage() {
             placeholder="Create a password"
             register={register('password', { required: true })}
           />
+          
+          {error && (
+            <p className="text-sm text-red-600 font-mono font-bold">{error}</p>
+          )}
 
           <button
             type="submit"

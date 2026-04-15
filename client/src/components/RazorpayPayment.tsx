@@ -30,7 +30,6 @@ const loadRazorpay = () => {
 
 function RazarpayPayment() {
   const { userData: user } = useSelector((state: any) => state.user);
-  const [paymentStatus, setPaymentStatus] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -60,7 +59,6 @@ function RazarpayPayment() {
           withCredentials: true,
         },
       );
-      console.log(response);
 
       const order = response.data.data as PaymentOrder;
 

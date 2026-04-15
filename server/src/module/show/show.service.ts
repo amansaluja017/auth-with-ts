@@ -5,15 +5,6 @@ import { eq } from "drizzle-orm";
 import ApiError from "../../common/utils/api-error";
 import { sql } from "drizzle-orm";
 
-function calculateDuration(start: Date, end: Date): string {
-  const diffMs = end.getTime() - start.getTime();
-  
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-  
-  return `${hours}:${minutes}`;
-};
-
 export const createShowService = async ({
   name,
   screenId,
@@ -44,7 +35,6 @@ export const createShowService = async ({
         screenId: screen.screenId,
         showStart: start,
         showEnd: end,
-        showDuration: calculateDuration(start, end),
         showGenre: genre,
       })
       .returning();
@@ -75,7 +65,6 @@ export const getShowsService = async ({
     .select({
       showId: showsTable.showId,
       showName: showsTable.showName,
-      showDuration: showsTable.showDuration,
       showStart: showsTable.showStart,
       showEnd: showsTable.showEnd,
       screenId: screensTable.screenId,

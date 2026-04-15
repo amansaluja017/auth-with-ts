@@ -398,7 +398,6 @@ export const getCustomerTicketsService = async ({ id }: { id: string }) => {
       showName: showsTable.showName,
       showStart: showsTable.showStart,
       showEnd: showsTable.showEnd,
-      showDuration: showsTable.showDuration,
       createdAt: ticketTable.createdAt,
       ticketId: ticketTable.ticketId
     })

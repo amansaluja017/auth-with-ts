@@ -18,6 +18,15 @@ export interface ShowsTypes {
   showGenre: string;
 }
 
+export function calculateDuration(start: Date, end: Date): string {
+  const diffMs = end.getTime() - start.getTime();
+  
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}h ${minutes}m`;
+};
+
 export function convertDate(date: string | undefined) {
   if (!date) return "";
   return new Date(date).toLocaleString("en-IN", {
@@ -26,7 +35,6 @@ export function convertDate(date: string | undefined) {
     year: "numeric",
     hour: "numeric",
     minute: "numeric",
-    second: "numeric",
     hour12: true,
   });
 }
@@ -105,7 +113,6 @@ function HomePage() {
                 Book my ticket
               </p>
               <p className="text-sm text-slate-400">
-                Premium movie seat booking
               </p>
             </div>
           </div>
@@ -202,7 +209,7 @@ function HomePage() {
                       {show.showGenre}
                     </span>
                     <span className="rounded-2xl bg-slate-900 px-3 py-2">
-                      {show.showDuration.split(".")[0]}h {show.showDuration.split(".")[1]}m
+                      {calculateDuration(new Date(show.showStart), new Date(show.showEnd))}
                     </span>
                   </div>
                   <div className="mt-6 flex items-center justify-end gap-4">

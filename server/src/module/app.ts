@@ -1,4 +1,4 @@
-import express from "express";
+import express, { ErrorRequestHandler, NextFunction, Request, Response } from "express";
 import { Express } from "express";
 import cors from "cors";
 import authRouter from "./auth/user/auth.routes";
@@ -26,6 +26,13 @@ function createExpressServer(): Express {
   app.use("/", showRoutes);
   app.use("/", seatRoutes);
   app.use("/payment", verifyJwt, paymentRoutes);
+  
+  app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    res.status(err.status || 500).json({
+      success: false,
+      message: err.message || "Internal Server Error",
+    });
+  });
 
   return app;
 }
