@@ -193,7 +193,7 @@ export const loginCustomerService = async (
 export const oauthTokenExchangeService = async (code: string) => {
 
   try {
-    const response = await axios.post("http://localhost:3001/o/token", {
+    const response = await axios.post(`${process.env.OIDC_ENDPOINT}/o/token`, {
       code,
       clientId: process.env.client_id,
       clientSecret: process.env.client_secret,

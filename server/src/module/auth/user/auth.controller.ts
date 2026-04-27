@@ -75,7 +75,7 @@ export const oauthTokenExchange = async (req: Request, res: Response) => {
 
   if (!idToken) ApiError.internalError("Internal Error: Failed to login customer");
 
-  const decoded = jwt.decode(idToken, {complete: true}) as unknown as { payload: JwtPayloadWithNonce };
+  const decoded = jwt.decode(idToken, { complete: true }) as unknown as { payload: JwtPayloadWithNonce };
 
   if (decoded.payload.nonce !== nonce) {
     throw ApiError.unauthorized("Invalid nonce");

@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { login } from "../slice/authSlice";
@@ -9,45 +9,58 @@ function CallbackLogin() {
   const code = searchParams.get("code") || "";
   const state = searchParams.get("state") || "";
 
-  const oauth_state = sessionStorage.getItem("oauth_state");
-  const nonce = sessionStorage.getItem("oauth_nonce");
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const hasRun = useRef(false);
 
   useEffect(() => {
-    async function exchangeCodeForToken() {
-      if (state !== oauth_state) {
-        console.error("Invalid state parameter");
-        return;
-      }
+    const exchangeCodeForToken = async () => {
+      if (hasRun.current) return;
+      hasRun.current = true;
 
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_ENDPOINT}/customer/o/token`,
-        {
-          code,
-          nonce,
-        },
-        { withCredentials: true },
-      );
-      const accessToken = response.data.data.accessToken;
+      try {
+        const oauth_state = sessionStorage.getItem("oauth_state");
+        const nonce = sessionStorage.getItem("oauth_nonce");
 
-      const userResponse = await axios.get(`http://localhost:3001/o/userinfo`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      if (userResponse.status === 200) {
-        const userData = userResponse.data.data;
-        dispatch(login({ ...userData, role: "customer", token: accessToken }));
-        sessionStorage.removeItem("oauth_state");
-        sessionStorage.removeItem("oauth_nonce");
-        navigate("/");
+        if (!state || !code || state !== oauth_state) return;
+
+        const response = await axios.post(
+          `${import.meta.env.VITE_API_ENDPOINT}/customer/o/token`,
+          { code, nonce },
+          { withCredentials: true },
+        );
+
+        if (response.status === 200) {
+          const accessToken = response.data.data.accessToken;
+          const userResponse = await axios.get(
+            `${import.meta.env.VITE_OIDC_ENDPOINT}/o/userinfo`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            },
+          );
+
+          if (userResponse.status === 200) {
+            dispatch(
+              login({
+                ...userResponse.data.data,
+                role: "customer",
+                token: accessToken,
+              }),
+            );
+            sessionStorage.removeItem("oauth_state");
+            sessionStorage.removeItem("oauth_nonce");
+            navigate("/");
+          }
+        }
+      } catch (error) {
+        console.error("OAuth callback error:", error);
       }
     };
 
     exchangeCodeForToken();
-  }, [code, state, oauth_state]);
+  }, [state, code, dispatch, navigate]);
 
   return <div>CallbackLogin</div>;
 }

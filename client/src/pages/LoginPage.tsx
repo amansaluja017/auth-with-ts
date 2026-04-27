@@ -50,7 +50,7 @@ function LoginPage() {
     const redirectUri = `http://localhost:5173/callback/oauth/login`;
     const state = "EfgXYhPQUvVNASTpBX6PpCz8mgEuI8oLiW7NpbEi3rD"; // You should generate a random state for security
     const nonce = "EfgXYhPQUvVNASTpBX6PpCz8mgEuI8oLiW7NpbEi3rD"; // You should generate a random nonce for security
-    const oauthUrl = `http://localhost:3001/o/authenticate?response_type=code&client_id=${clientId}&redirect_url=${encodeURIComponent(redirectUri)}&scope=openid profile email&state=${state}&&nonce=${nonce}`;
+    const oauthUrl = `${import.meta.env.VITE_OIDC_ENDPOINT}/o/authenticate?response_type=code&client_id=${clientId}&redirect_url=${encodeURIComponent(redirectUri)}&scope=openid profile email&state=${state}&&nonce=${nonce}`;
 
     sessionStorage.setItem("oauth_state", state);
     sessionStorage.setItem("oauth_nonce", nonce);
